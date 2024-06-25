@@ -108,14 +108,14 @@ Resources:
     Properties:
       HealthCheckIntervalSeconds: 5
       HealthCheckPath: '/'
-      HealthCheckPort: '9001'
+      HealthCheckPort: '3000'
       HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 3
       HealthyThresholdCount: 2
       UnhealthyThresholdCount: 2
       Matcher:
         HttpCode: '200,302'
-      Port: 9001
+      Port: 3000
       Protocol: HTTP
       VpcId: !Ref VPC
   LoadBalancerSecurityGroup:
@@ -185,18 +185,20 @@ Resources:
             trap '/opt/aws/bin/cfn-signal -e 1 --stack ${AWS::StackName} --resource AutoScalingGroup --region ${AWS::Region}' ERR
 
             # Execute as invidious user
-            su invidious -c '
-            cd invidious
+            sudo su invidious <<EOF
+            cd /home/invidious/invidious
             # Configure config/config.yml as you like
             cp config/config.example.yml config/config.yml
+            sed -i -e "/hmac_key: / s/: .*/: $(openssl rand -hex 20)/" config/config.yml
             sed -i -e '/host: / s/: .*/: ${Database.Endpoint.Address}/' config/config.yml
-            sed -i -e '/port: / s/: .*/: 3306/' config/config.yml
+            sed -i -e '/port: / s/: .*/: 5432/' config/config.yml
             sed -i -e '/user: / s/: .*/: kemal/' config/config.yml
             sed -i -e '/password: / s/: .*/: kemal123/' config/config.yml
             sed -i -e '/dbname: / s/: .*/: invidious/' config/config.yml
 
-            # Deploy the database
-            ./invidious --migrate'
+            # Deploy the database./invidious --migrate
+            ./invidious --migrate
+            EOF
 
             # Enable systemd service
             cp /home/invidious/invidious/invidious.service /etc/systemd/system/invidious.service
@@ -227,7 +229,7 @@ Resources:
     UpdatePolicy:
       AutoScalingRollingUpdate:
         PauseTime: PT10M
-        WaitOnResourceSignals: true
+        WaitOnResourceSignals: false
         MinInstancesInService: 1
   DatabaseSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
@@ -236,8 +238,8 @@ Resources:
       VpcId: !Ref VPC
       SecurityGroupIngress:
       - IpProtocol: tcp
-        FromPort: 3306
-        ToPort: 3306
+        FromPort: 5432
+        ToPort: 5432
         SourceSecurityGroupId: !Ref InvidiousSecurityGroup
   Database:
     Type: 'AWS::RDS::DBInstance'
