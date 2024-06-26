@@ -189,6 +189,7 @@ Resources:
             cd /home/invidious/invidious
             # Configure config/config.yml as you like
             cp config/config.example.yml config/config.yml
+            # Configure Invidious to use RDS
             sed -i -e "/hmac_key: / s/: .*/: $(openssl rand -hex 20)/" config/config.yml
             sed -i -e '/host: / s/: .*/: ${Database.Endpoint.Address}/' config/config.yml
             sed -i -e '/port: / s/: .*/: 5432/' config/config.yml
@@ -196,7 +197,7 @@ Resources:
             sed -i -e '/password: / s/: .*/: kemal123/' config/config.yml
             sed -i -e '/dbname: / s/: .*/: invidious/' config/config.yml
 
-            # Deploy the database./invidious --migrate
+            # Deploy the database.
             ./invidious --migrate
             EOF
 
@@ -212,8 +213,8 @@ Resources:
       LaunchTemplate:
         LaunchTemplateId: !Ref LaunchTemplate
         Version: !GetAtt 'LaunchTemplate.LatestVersionNumber'
-      MinSize: '1'
-      MaxSize: '2'
+      MinSize: '2'
+      MaxSize: '4'
       HealthCheckGracePeriod: 300
       HealthCheckType: ELB
       VPCZoneIdentifier:
@@ -230,7 +231,7 @@ Resources:
       AutoScalingRollingUpdate:
         PauseTime: PT10M
         WaitOnResourceSignals: false
-        MinInstancesInService: 1
+        MinInstancesInService: 2
   DatabaseSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
@@ -255,6 +256,7 @@ Resources:
       VPCSecurityGroups:
       - !Sub ${DatabaseSecurityGroup.GroupId}
       DBSubnetGroupName: !Ref DBSubnetGroup
+      MultiAZ: true
     DependsOn: VPCGatewayAttachment
   DBSubnetGroup:
     Type: 'AWS::RDS::DBSubnetGroup'
