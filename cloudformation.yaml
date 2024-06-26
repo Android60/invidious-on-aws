@@ -213,8 +213,8 @@ Resources:
       LaunchTemplate:
         LaunchTemplateId: !Ref LaunchTemplate
         Version: !GetAtt 'LaunchTemplate.LatestVersionNumber'
-      MinSize: '2'
-      MaxSize: '4'
+      MinSize: '2' # Run in HA mode
+      MaxSize: '4' # Can scale up to 4 instances with ScalingPolicy
       HealthCheckGracePeriod: 300
       HealthCheckType: ELB
       VPCZoneIdentifier:
@@ -240,7 +240,7 @@ Resources:
       TargetTrackingConfiguration:
         PredefinedMetricSpecification:
           PredefinedMetricType: ASGAverageCPUUtilization
-        TargetValue: 50
+        TargetValue: 50 # Maintain 50% CPU usage
       EstimatedInstanceWarmup: 60
   DatabaseSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
