@@ -8,3 +8,9 @@ This repository contains templates to deploy highly available Invidious instance
 - Scaling Policy that will maintain 50% CPU utilization across ASG
 - Launch Template with t3.micro instance type and bootstrap configuration script
 - Application Load Balancer
+
+# Create Invidious AMI
+You need to build AMI for Invidious with included Packer template.
+```
+packer build packer/invidious.pkr.hcl
+```
