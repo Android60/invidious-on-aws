@@ -11,13 +11,13 @@ This repository contains templates to deploy highly available Invidious instance
 ![infrastructure  diagram](/images/infrastructure.png "Infrastructure diagram")
 
 
-# Create Invidious AMI
+## Create Invidious AMI
 You need to build AMI for Invidious with included Packer template.
 ```
 packer build packer/invidious.pkr.hcl
 ```
 
-# Deploy with Cloudformation
+## Deploy with Cloudformation
 ```
 # Set AMI ID from previous step
 export AMI='ami-1234yourami678'
