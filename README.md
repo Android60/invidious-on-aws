@@ -1,7 +1,7 @@
 # Invidious HA on AWS
 This repository contains templates to deploy highly available Invidious instance on AWS. This architecture makes use of RDS MultiAZ, Application LoadBalancer and Auto Scaling Groups.
 
-## infrastructure
+## Infrastructure
 - Two subnets in different availability zones
 - RDS in higly available mode and snapshots enabled
 - Auto Scaling Group (instances: 2 min, 4 max)
