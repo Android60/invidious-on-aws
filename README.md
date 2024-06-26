@@ -16,3 +16,10 @@ You need to build AMI for Invidious with included Packer template.
 ```
 packer build packer/invidious.pkr.hcl
 ```
+
+# Deploy with Cloudformation
+```
+# Set AMI ID from previous step
+export AMI='ami-1234yourami678'
+aws cloudformation deploy --stack-name invidious --template-file cloudformation.yaml --parameter-overrides AMI=$AMI --capabilities CAPABILITY_IAM
+```
